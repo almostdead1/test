@@ -90,9 +90,6 @@ jobs:
     - name: Remove old KernelSU
       run: rm -rf KernelSU
 
-    - name: Remove old kernelsu symlink
-      run: rm drivers/kernelsu
-
     - name: KernelSU global --add safe.directory
       run: git config --global --add safe.directory /github/workspace/KernelSU 
 
