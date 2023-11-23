@@ -77,7 +77,6 @@ jobs:
 
     - name: Download Clang Toolchain
       run: |
-        mkdir clang
         git clone --depth=1 ${{ env.CLANG_URL }}
         
     - name: Checkout Kernel Source
