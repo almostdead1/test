@@ -85,7 +85,7 @@ jobs:
         github-server-url: 'https://github.com'
         repository: ${{ env.KERNEL_SOURCE }}
         ref: ${{ env.KERNEL_SOURCE_BRANCH }}
-        path: android-kernel
+        path: 
 
     - name: Remove old KernelSU
       run: rm -rf KernelSU
@@ -96,7 +96,6 @@ jobs:
     - name: Setup KernelSU
       if: env.USE_KERNELSU == 'true'
       run: |
-        cd android-kernel
         if [ ${{ env.USE_KPROBES }} = true ] ; then
             echo "CONFIG_MODULES=y" >> arch/${{ env.TARGET_ARCH }}/configs/${{ env.KERNEL_DEFCONFIG }}
             echo "CONFIG_KPROBES=y" >> arch/${{ env.TARGET_ARCH }}/configs/${{ env.KERNEL_DEFCONFIG }}
@@ -111,7 +110,6 @@ jobs:
 
     - name: Generate kernel configuration
       run: |
-        cd android-kernel
         export PATH=$GITHUB_WORKSPACE/proton-clang/bin:$PATH
         export ARCH=${{ env.TARGET_ARCH }}
         export SUBARCH=${{ env.TARGET_ARCH }}
@@ -126,7 +124,6 @@ jobs:
 
     - name: Build kernel
       run: |
-        cd android-kernel
         export PATH=$GITHUB_WORKSPACE/proton-clang/bin:$PATH
         export ARCH=${{ env.TARGET_ARCH }}
         export SUBARCH=${{ env.TARGET_ARCH }}
@@ -139,12 +136,12 @@ jobs:
 
     - name: Check the kernel output files
       run: |
-       if [ -f android-kernel/out/arch/${{ env.TARGET_ARCH }}/boot/${{ env.KERNEL_FILE }} ] ; then
+       if [ -f /out/arch/${{ env.TARGET_ARCH }}/boot/${{ env.KERNEL_FILE }} ] ; then
            echo "CHECK_KERNEL_FILE_IS_OK=true" >> $GITHUB_ENV
        else
            echo "Kernel output file is empty"
        fi
-       if [ -f android-kernel/out/arch/${{ env.TARGET_ARCH }}/boot/dtbo.img ] ; then
+       if [ -f /out/arch/${{ env.TARGET_ARCH }}/boot/dtbo.img ] ; then
            echo "CHECK_DTBO_IS_OK=true" >> $GITHUB_ENV
        else
            echo "DTBO image is empty"
@@ -155,14 +152,14 @@ jobs:
       uses: actions/upload-artifact@v3
       with:
         name: ${{ env.KERNEL_FILE }}${{ env.UPLOADNAME }}-${{ env.DEVICE }}-${{ env.BUILD_TIME }}
-        path: android-kernel/out/arch/${{ env.TARGET_ARCH }}/boot/${{ env.KERNEL_FILE }}
+        path: /out/arch/${{ env.TARGET_ARCH }}/boot/${{ env.KERNEL_FILE }}
 
     - name: Upload DTBO image
       if: env.CHECK_DTBO_IS_OK == 'true'
       uses: actions/upload-artifact@v3
       with:
         name: dtbo-${{ env.DEVICE }}-${{ env.BUILD_TIME }}
-        path: android-kernel/out/arch/${{ env.TARGET_ARCH }}/boot/dtbo.img
+        path: /out/arch/${{ env.TARGET_ARCH }}/boot/dtbo.img
 
     - name: Checkout osm0sis/AnyKernel3
       uses: actions/checkout@v3
@@ -178,14 +175,14 @@ jobs:
         sed -i 's!block=/dev/block/platform/omap/omap_hsmmc.0/by-name/boot;!block=auto;!g' anykernel.sh
         sed -i 's/is_slot_device=0;/is_slot_device=auto;/g' anykernel.sh
         if [ ${{ env.CHECK_KERNEL_FILE_IS_OK }} = true ] ; then
-            cp -fp ../android-kernel/out/arch/${{ env.TARGET_ARCH }}/boot/${{ env.KERNEL_FILE }} ./
+            cp -fp ../out/arch/${{ env.TARGET_ARCH }}/boot/${{ env.KERNEL_FILE }} ./
         fi
         if [ ${{ env.CHECK_DTBO_IS_OK }} = true ] ; then
-            cp -fp ../android-kernel/out/arch/${{ env.TARGET_ARCH }}/boot/dtbo.img ./
+            cp -fp ../out/arch/${{ env.TARGET_ARCH }}/boot/dtbo.img ./
         fi
-        cp -fp ../android-kernel/out/arch/${{ env.TARGET_ARCH }}/boot/dtb ./
-        cp -fp ../android-kernel/out/.config ./
-        cp -fp ../android-kernel/out/defconfig ./
+        cp -fp ../out/arch/${{ env.TARGET_ARCH }}/boot/dtb ./
+        cp -fp ../out/.config ./
+        cp -fp ../out/defconfig ./
         rm -rf .git* modules patch ramdisk
 
     - name: Upload AnyKernel3
