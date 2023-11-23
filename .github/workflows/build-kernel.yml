@@ -88,6 +88,15 @@ jobs:
         submodules: recursive
         path: android-kernel
 
+    - name: Remove old KernelSU
+      run: rm -rf KernelSU
+
+    - name: Remove old kernelsu symlink
+      run: rm drivers/kernelsu
+
+    - name: KernelSU global --add safe.directory
+      run: git config --global --add safe.directory /github/workspace/KernelSU 
+
     - name: Setup KernelSU
       if: env.USE_KERNELSU == 'true'
       run: |
