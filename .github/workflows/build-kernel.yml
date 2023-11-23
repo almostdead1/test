@@ -85,7 +85,6 @@ jobs:
         github-server-url: 'https://github.com'
         repository: ${{ env.KERNEL_SOURCE }}
         ref: ${{ env.KERNEL_SOURCE_BRANCH }}
-        submodules: recursive
         path: android-kernel
 
     - name: Remove old KernelSU
